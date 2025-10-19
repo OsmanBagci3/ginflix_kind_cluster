@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ginflix-frontend-admin
+  namespace: ginflix
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ginflix-frontend-admin
+  template:
+    metadata:
+      labels:
+        app: ginflix-frontend-admin
+    spec:
+      containers:
+        - name: frontend-admin
+          image: ginflix-frontend-admin:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ginflix-frontend-admin-config
+                  key: BACKEND_URL
+            - name: STREAM_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ginflix-frontend-admin-config
+                  key: STREAM_URL
+            - name: AUTH_DISABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: ginflix-frontend-admin-config
+                  key: AUTH_DISABLED
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ginflix-frontend-admin
+  namespace: ginflix
+spec:
+  type: NodePort
+  selector:
+    app: ginflix-frontend-admin
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30083

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ginflix-frontend-admin-config
+  namespace: ginflix
+data:
+  BACKEND_URL: "http://localhost:30081"
+  STREAM_URL:  "http://localhost:30082"
+  AUTH_DISABLED: "true"

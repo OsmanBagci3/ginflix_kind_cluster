@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ginflix-streamer
+  namespace: ginflix
+spec:
+  replicas: 3  
+  selector:
+    matchLabels:
+      app: ginflix-streamer
+  template:
+    metadata:
+      labels:
+        app: ginflix-streamer
+    spec:
+      containers:
+        - name: streamer
+          image: ginflix-streamer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: GARAGE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_ENDPOINT
+            - name: GARAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_BUCKET
+            - name: GARAGE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_ACCESS_KEY
+            - name: GARAGE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_SECRET_KEY
+            - name: GARAGE_USE_SSL
+              valueFrom:
+                configMapKeyRef:
+                  name: streamer-config
+                  key: GARAGE_USE_SSL
+          volumeMounts:
+            - name: stream-cache
+              mountPath: /tmp/cache
+      volumes:
+        - name: stream-cache
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ginflix-streamer
+  namespace: ginflix
+spec:
+  type: NodePort  
+  selector:
+    app: ginflix-streamer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080        
+      targetPort: 8080  
+      nodePort: 30082   

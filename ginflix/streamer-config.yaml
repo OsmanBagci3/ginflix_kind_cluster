@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: streamer-config
+  namespace: ginflix
+data:
+  GARAGE_USE_SSL: "false"
