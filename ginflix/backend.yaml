@@ -30,19 +30,43 @@ spec:
                 configMapKeyRef:
                   name: ginflix-backend-config
                   key: AUTH_DISABLED
+ 
+            - name: GARAGE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_ENDPOINT
+            - name: GARAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_BUCKET
+            - name: GARAGE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_ACCESS_KEY
+            - name: GARAGE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-secret
+                  key: GARAGE_SECRET_KEY
+            - name: GARAGE_USE_SSL
+              valueFrom:
+                configMapKeyRef:
+                  name: streamer-config
+                  key: GARAGE_USE_SSL
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ginflix-backend
+  name: ginflix-backend-svc
   namespace: ginflix
 spec:
-  type: NodePort   
+  type: NodePort
   selector:
     app: ginflix-backend
   ports:
-    - name: http
-      protocol: TCP
-      port: 8080        
-      targetPort: 8080  
-      nodePort: 30081  
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30081 
